@@ -51,13 +51,12 @@ private
     @enemy_direction = [:backward].find { |d| enemy_in_range?(d) }
     @captive_direction = [:backward].find { |d| captive_in_range?(d) }
     @stairs_direction = [:backward].find { |d| stairs_in_range?(d) }
-    @needs_health = true if !fit? && enemies_visible?
+    (@needs_health = false; puts_color(ANSI_GREEN, "Fighting fit")) if @needs_health && health >= required_health
   end
 
   def after_turn
     @prev_health = health
     @turn += 1
-    @needs_health = false if fit?
   end
 
   def first_turn?
@@ -78,6 +77,10 @@ private
   end
 
   def hurting_action
+    puts "next_enemy_name: #{next_enemy_name}"
+    puts "required health: #{required_health}"
+    (@needs_health = true; puts_color(ANSI_RED, "Need rest!")) if !@needs_health && health < required_health
+
     case
     when @needs_health && safe?
       :rest!
@@ -93,8 +96,8 @@ private
     return :attack! if engaged?
     return [:pivot!, @archer_direction]   if @archer_direction
     return [:pivot!, @enemy_direction]  if @enemy_direction
-    return :walk!   if sludge_in_range?
-    return :shoot!  if clear_shot_on_enemy?
+    #return :walk!   if sludge_in_range?
+    return :shoot!  if clear_shot_on_wizard?
 
     # Deal with captives
     return [:pivot!, @captive_direction]  if @captive_direction

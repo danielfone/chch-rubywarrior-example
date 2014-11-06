@@ -1,8 +1,25 @@
 module WarriorContext
 
-  def clear_shot_on_enemy?
-    units = look.select { |s| s.unit }
-    units.any? && units.first.enemy?
+  def required_health
+    case next_unit_name
+    when "Sludge"
+      6+1
+    when "Thick Sludge"
+      12+1
+    when "Archer"
+      5+1
+    else
+      0
+    end
+  end
+
+  def next_unit_name
+    next_unit_space = look.find { |s| s.unit }
+    next_unit_space.unit.name if next_unit_space
+  end
+
+  def clear_shot_on_wizard?
+    next_unit_name == 'Wizard'
   end
 
   def engaged?(direction=:forward)
@@ -33,8 +50,8 @@ module WarriorContext
     look(direction).any? { |s| s.unit && s.unit.name == "Archer" }
   end
 
-  def sludge_in_range?(direction=:forward)
-    look(direction).any? { |s| s.unit && s.unit.name == "Sludge" }
+  def wizard_in_range?(direction=:forward)
+    look(direction).any? { |s| s.unit && s.unit.name == "Wizard" }
   end
 
   def enemies_visible?

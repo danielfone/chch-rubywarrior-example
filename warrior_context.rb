@@ -8,9 +8,9 @@ module WarriorContext
     when / aa/
       11
     when /  a/
-      11
+      9
     when / a./
-      7
+      6
     when / s./
       7
     else

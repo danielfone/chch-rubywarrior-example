@@ -18,8 +18,13 @@ module WarriorState
   end
 
   def health_critical?
-    health < FULL_HEALTH*0.40
+    health < FULL_HEALTH*0.30
   end
+
+  def health_not_optimal?
+    health < FULL_HEALTH*0.70
+  end
+
 
   def taking_damage?
     health < @prev_health

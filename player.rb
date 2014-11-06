@@ -1,13 +1,15 @@
 require 'pry'
 require 'forwardable'
-require_relative 'logging'
-require_relative 'warrior_state'
+require 'logging'
+require 'warrior_state'
+require 'warrior_context'
 
 include ColorLogging
 
 class Player
   extend Forwardable
   include WarriorState
+  include WarriorContext
 
   attr_reader :warrior, :prev_health
 
@@ -45,10 +47,10 @@ private
   def before_turn
     #@seen_rear_wall = true if feel(:backward).wall?
     @direction = :forward
-    @archer_direction = [:backward, :left, :right].find { |d| archer_in_range?(d) }
-    @enemy_direction = [:backward, :left, :right].find { |d| enemy_in_range?(d) }
-    @captive_direction = [:backward, :left, :right].find { |d| captive_in_range?(d) }
-    @stairs_direction = [:backward, :left, :right].find { |d| stairs_in_range?(d) }
+    @archer_direction = [:backward].find { |d| archer_in_range?(d) }
+    @enemy_direction = [:backward].find { |d| enemy_in_range?(d) }
+    @captive_direction = [:backward].find { |d| captive_in_range?(d) }
+    @stairs_direction = [:backward].find { |d| stairs_in_range?(d) }
   end
 
   def after_turn
@@ -75,12 +77,16 @@ private
 
   def hurting_action
     case
-    when level_clear?
+    when range_clear?
       go_to_stairs
-    when safe?
+    when safe? && enemies_visible? && health_not_optimal?
       :rest!
-    else
+    when engaged?
+      :attack!
+    when !safe?
       [:walk!, :backward]
+    else
+      :walk!
     end
   end
 
@@ -89,6 +95,7 @@ private
     return [:pivot!, @archer_direction]   if @archer_direction
     return [:pivot!, @enemy_direction]  if @enemy_direction
     return :attack! if engaged?
+    return :walk!   if sludge_in_range?
     return :shoot!  if clear_shot_on_enemy?
 
     # Deal with captives
@@ -98,7 +105,7 @@ private
     # navigate
     return [:pivot!, :backward]  if blocked?
     return [:pivot!, @stairs_direction] if @stairs_direction
-    go_to_stairs if level_clear?
+    go_to_stairs if range_clear?
     return :walk!
   end
 
@@ -106,51 +113,5 @@ private
     return [:pivot!, @stairs_direction] if @stairs_direction
     return :walk!
   end
-
-  def clear_shot_on_enemy?
-    units = look.select { |s| s.unit }
-    units.any? && units.first.enemy?
-  end
-
-  def engaged?(direction=@direction)
-    feel(direction).enemy?
-  end
-
-  def near_captive?
-    feel(@direction).captive?
-  end
-
-  def blocked?
-    feel(@direction).wall?
-  end
-
-  def enemy_in_range?(direction=:forward)
-    look(direction).any? &:enemy?
-  end
-
-  def captive_in_range?(direction=:forward)
-    look(direction).any? &:captive?
-  end
-
-  def stairs_in_range?(direction=:forward)
-    look(direction).any? &:stairs?
-  end
-
-  def archer_in_range?(direction=:forward)
-    look(direction).any? { |s| s.unit && s.unit.name == "Archer" }
-  end
-
-  def level_clear?
-    stairs_in_range? && ! enemy_in_range? && ! captive_in_range?
-  end
-
-  def safe?
-    [:forward, :backward, :left, :right].none? { |d| engaged? d } &&
-    [:forward, :backward, :left, :right].none? {|d| archer_in_range? d }
-  end
-
-end
-
-module WarriorContext
 
 end

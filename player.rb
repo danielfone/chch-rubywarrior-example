@@ -51,11 +51,13 @@ private
     @enemy_direction = [:backward].find { |d| enemy_in_range?(d) }
     @captive_direction = [:backward].find { |d| captive_in_range?(d) }
     @stairs_direction = [:backward].find { |d| stairs_in_range?(d) }
+    @needs_health = true if !fit? && enemies_visible?
   end
 
   def after_turn
     @prev_health = health
     @turn += 1
+    @needs_health = false if fit?
   end
 
   def first_turn?
@@ -77,24 +79,20 @@ private
 
   def hurting_action
     case
-    when range_clear?
-      go_to_stairs
-    when safe? && enemies_visible? && health_not_optimal?
+    when @needs_health && safe?
       :rest!
-    when engaged?
-      :attack!
-    when !safe?
+    when @needs_health && !safe?
       [:walk!, :backward]
     else
-      :walk!
+      ready_to_go_action
     end
   end
 
   def ready_to_go_action
     # Deal with enemies
+    return :attack! if engaged?
     return [:pivot!, @archer_direction]   if @archer_direction
     return [:pivot!, @enemy_direction]  if @enemy_direction
-    return :attack! if engaged?
     return :walk!   if sludge_in_range?
     return :shoot!  if clear_shot_on_enemy?
 

@@ -6,8 +6,8 @@ module WarriorState
     case
     when taking_damage?
       :taking_damage.tap { puts_color(ANSI_RED, "Taking damage") }
-    when safe? && ! fit?
-      :safe_hurting.tap { puts_color(ANSI_ORANGE, "Hurting: #{health}/#{FULL_HEALTH}") }
+    when ! fit?
+      :hurting.tap { puts_color(ANSI_ORANGE, "Hurting: #{health}/#{FULL_HEALTH}") }
     else
       :ready_to_go.tap { puts_color(ANSI_GREEN, "Ready to go!") }
     end
@@ -19,10 +19,6 @@ module WarriorState
 
   def health_critical?
     health < FULL_HEALTH*0.40
-  end
-
-  def safe?
-    ! taking_damage?
   end
 
   def taking_damage?

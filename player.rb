@@ -15,6 +15,7 @@ class Player
     :health,
     :feel,
     :look,
+    :listen,
   ]
 
   def play_turn(warrior)
@@ -29,7 +30,7 @@ private
   def choose_action
     case current_state
     when :taking_damage then taking_damage_action
-    when :safe_hurting  then safe_hurting_action
+    when :hurting       then hurting_action
     when :ready_to_go   then ready_to_go_action
     end
   end
@@ -47,6 +48,7 @@ private
     @archer_direction = [:backward, :left, :right].find { |d| archer_in_range?(d) }
     @enemy_direction = [:backward, :left, :right].find { |d| enemy_in_range?(d) }
     @captive_direction = [:backward, :left, :right].find { |d| captive_in_range?(d) }
+    @stairs_direction = [:backward, :left, :right].find { |d| stairs_in_range?(d) }
   end
 
   def after_turn
@@ -71,8 +73,15 @@ private
     end
   end
 
-  def safe_hurting_action
-    :rest!
+  def hurting_action
+    case
+    when level_clear?
+      go_to_stairs
+    when safe?
+      :rest!
+    else
+      [:walk!, :backward]
+    end
   end
 
   def ready_to_go_action
@@ -88,6 +97,13 @@ private
 
     # navigate
     return [:pivot!, :backward]  if blocked?
+    return [:pivot!, @stairs_direction] if @stairs_direction
+    go_to_stairs if level_clear?
+    return :walk!
+  end
+
+  def go_to_stairs
+    return [:pivot!, @stairs_direction] if @stairs_direction
     return :walk!
   end
 
@@ -96,8 +112,8 @@ private
     units.any? && units.first.enemy?
   end
 
-  def engaged?
-    feel(@direction).enemy?
+  def engaged?(direction=@direction)
+    feel(direction).enemy?
   end
 
   def near_captive?
@@ -116,12 +132,21 @@ private
     look(direction).any? &:captive?
   end
 
-  def clear_shot?
-    look.none? &:captive?
+  def stairs_in_range?(direction=:forward)
+    look(direction).any? &:stairs?
   end
 
   def archer_in_range?(direction=:forward)
-    look(direction).any? { |s| s.unit && (puts s.unit.name; s.unit.name == "Archer") }
+    look(direction).any? { |s| s.unit && s.unit.name == "Archer" }
+  end
+
+  def level_clear?
+    stairs_in_range? && ! enemy_in_range? && ! captive_in_range?
+  end
+
+  def safe?
+    [:forward, :backward, :left, :right].none? { |d| engaged? d } &&
+    [:forward, :backward, :left, :right].none? {|d| archer_in_range? d }
   end
 
 end

@@ -51,7 +51,7 @@ private
     @enemy_direction = [:backward].find { |d| enemy_in_range?(d) }
     @captive_direction = [:backward].find { |d| captive_in_range?(d) }
     @stairs_direction = [:backward].find { |d| stairs_in_range?(d) }
-    (@needs_health = false; puts_color(ANSI_GREEN, "Fighting fit")) if @needs_health && health >= required_health
+    (@needs_health = false; puts_color(ANSI_GREEN, "Fighting fit")) if @needs_health && health >= @required_health
   end
 
   def after_turn
@@ -65,26 +65,28 @@ private
 
   def taking_damage_action
     case
-    when health_critical?
+    when engaged? && health_critical?
       [:walk!, :backward]
     when engaged?
       :attack!
-    when clear_shot_on_enemy?
-      :shoot!
     else
-      :walk!
+      hurting_action
     end
   end
 
   def hurting_action
-    puts "next_enemy_name: #{next_enemy_name}"
-    puts "required health: #{required_health}"
-    (@needs_health = true; puts_color(ANSI_RED, "Need rest!")) if !@needs_health && health < required_health
+    puts "next_unit_name: #{next_unit_name} — need #{required_health}"
+    if !@needs_health && health < required_health
+      @required_health = required_health
+      @needs_health = true
+      puts_color(ANSI_RED, "Need rest!")
+    end
 
     case
     when @needs_health && safe?
       :rest!
     when @needs_health && !safe?
+      @required_health += 3
       [:walk!, :backward]
     else
       ready_to_go_action
@@ -92,16 +94,18 @@ private
   end
 
   def ready_to_go_action
-    # Deal with enemies
-    return :attack! if engaged?
-    return [:pivot!, @archer_direction]   if @archer_direction
-    return [:pivot!, @enemy_direction]  if @enemy_direction
-    #return :walk!   if sludge_in_range?
-    return :shoot!  if clear_shot_on_wizard?
-
     # Deal with captives
     return [:pivot!, @captive_direction]  if @captive_direction
     return :rescue! if near_captive?
+    return :walk! if next_unit_name == 'Captive'
+
+    # Deal with enemies
+    return :attack! if engaged?
+    return :shoot!  if clear_shot_on_wizard?
+    return :walk!   if enemy_in_range?
+    return [:pivot!, @archer_direction]   if @archer_direction
+    return [:pivot!, @enemy_direction]  if @enemy_direction
+
 
     # navigate
     return [:pivot!, :backward]  if blocked?

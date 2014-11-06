@@ -1,16 +1,25 @@
 module WarriorContext
 
   def required_health
-    case next_unit_name
-    when "Sludge"
-      6+1
-    when "Thick Sludge"
-      12+1
-    when "Archer"
-      5+1
+    puts "next_spaces: #{next_spaces}"
+    case next_spaces
+    when / S./
+      13
+    when / aa/
+      11
+    when /  a/
+      11
+    when / a./
+      7
+    when / s./
+      7
     else
       0
     end
+  end
+
+  def next_spaces
+    look.map(&:character).join
   end
 
   def next_unit_name

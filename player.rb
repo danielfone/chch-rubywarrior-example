@@ -9,9 +9,9 @@ include ColorLogging
 
 class Player
   extend Forwardable
+  include Eventable
   include WarriorState
   include WarriorContext
-  include Eventable
 
   attr_reader :warrior, :prev_health
 
@@ -23,12 +23,15 @@ class Player
   ]
 
   on :game_start, :initialize_game
+  on :turn_start, :before_turn
+  on :turn_finish, :after_turn
+
 
   def play_turn(warrior)
     trigger :game_start, warrior if first_turn?
-    before_turn
+    trigger :turn_start
     warrior.send *choose_action
-    after_turn
+    trigger :turn_finish
   end
 
 private
@@ -43,7 +46,6 @@ private
 
   def initialize_game(warrior)
     @turn        = 1
-    @prev_health ||= 0
     @warrior     ||= warrior
   end
 
@@ -57,7 +59,6 @@ private
   end
 
   def after_turn
-    @prev_health = health
     @turn += 1
   end
 

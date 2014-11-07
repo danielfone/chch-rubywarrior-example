@@ -2,6 +2,11 @@ module WarriorState
 
   FULL_HEALTH = 20
 
+  def self.included(base)
+    base.on :game_start, :initialize_health
+    base.on :turn_finish, :remember_health
+  end
+
   def current_state
     case
     when taking_damage?
@@ -23,6 +28,16 @@ module WarriorState
 
   def taking_damage?
     health < @prev_health
+  end
+
+private
+
+  def initialize_health(warrior)
+    @prev_health = 0
+  end
+
+  def remember_health
+    @prev_health = health
   end
 
 end

@@ -86,7 +86,6 @@ private
   end
 
   def required_health
-    puts "next_spaces: #{next_spaces.inspect}"
     case next_spaces
     when / S./
       13

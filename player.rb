@@ -28,7 +28,6 @@ class Player
   on :turn_start, :before_turn
   on :turn_finish, :increment_turn
 
-
   def play_turn(warrior)
     trigger :game_start, warrior if first_turn?
     trigger :turn_start
@@ -49,7 +48,6 @@ private
     @enemy_direction = [:backward].find { |d| enemy_in_range?(d) }
     @captive_direction = [:backward].find { |d| captive_in_range?(d) }
     @stairs_direction = [:backward].find { |d| stairs_in_range?(d) }
-    (@needs_health = false; puts_color(ANSI_GREEN, "Fighting fit")) if @needs_health && health >= @required_health
   end
 
   def increment_turn

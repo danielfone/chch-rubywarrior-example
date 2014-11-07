@@ -7,7 +7,7 @@ module WarriorState
     base.on :turn_finish, :remember_health
   end
 
-  def current_state
+  def physical_state
     case
     when taking_damage?
       :taking_damage.tap { puts_color(ANSI_RED, "Taking damage") }

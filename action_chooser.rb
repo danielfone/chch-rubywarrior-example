@@ -1,7 +1,14 @@
 module ActionChooser
 
+  def self.included(base)
+    base.on :turn_start, *[
+      :assess_fitness,
+      :assess_required_health,
+    ]
+  end
+
   def choose_action
-    case current_state
+    case physical_state
     when :taking_damage then taking_damage_action
     when :hurting       then hurting_action
     when :ready_to_go   then ready_to_go_action
@@ -22,13 +29,6 @@ private
   end
 
   def hurting_action
-    puts "next_unit_name: #{next_unit_name} — need #{required_health}"
-    if !@needs_health && health < required_health
-      @required_health = required_health
-      @needs_health = true
-      puts_color(ANSI_RED, "Need rest!")
-    end
-
     case
     when @needs_health && safe?
       :rest!
@@ -68,6 +68,21 @@ private
 
   def retreat!
     [:walk!, :backward]
+  end
+
+  def assess_fitness
+    if @needs_health && health >= @required_health
+      @needs_health = false
+      puts_color ANSI_GREEN, "Fighting fit"
+    end
+  end
+
+  def assess_required_health
+    if !@needs_health && health < required_health
+      @required_health = required_health
+      @needs_health    = true
+      puts_color ANSI_RED, "Need rest!"
+    end
   end
 
 end

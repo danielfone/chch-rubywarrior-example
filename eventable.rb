@@ -10,7 +10,6 @@ module Eventable
 
     def on(event, *methods)
       listeners[event] += Array(methods)
-      puts listeners.inspect
     end
   end
 

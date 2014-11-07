@@ -1,23 +1,5 @@
 module WarriorContext
 
-  def required_health
-    puts "next_spaces: #{next_spaces.inspect}"
-    case next_spaces
-    when / S./
-      13
-    when / aa/
-      11
-    when /  a/
-      9
-    when / a./
-      6
-    when / s./
-      7
-    else
-      0
-    end
-  end
-
   def next_spaces
     look.map(&:character).join
   end

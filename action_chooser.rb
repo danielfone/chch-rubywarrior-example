@@ -30,10 +30,10 @@ private
 
   def hurting_action
     case
-    when @needs_health && safe?
+    when @target_health && safe?
       :rest!
-    when @needs_health && !safe?
-      @required_health += 3 # accounts for archers
+    when @target_health && !safe?
+      @target_health += 3 # accounts for archers
       retreat!
     else
       ready_to_go_action
@@ -71,17 +71,35 @@ private
   end
 
   def assess_fitness
-    if @needs_health && health >= @required_health
-      @needs_health = false
+    if @target_health && health >= @target_health
+      @target_health = nil
       puts_color ANSI_GREEN, "Fighting fit"
     end
   end
 
   def assess_required_health
-    if !@needs_health && health < required_health
-      @required_health = required_health
-      @needs_health    = true
+    return if @target_health # We've already got a target, don't update
+    if health < required_health
+      @target_health = required_health
       puts_color ANSI_RED, "Need rest!"
+    end
+  end
+
+  def required_health
+    puts "next_spaces: #{next_spaces.inspect}"
+    case next_spaces
+    when / S./
+      13
+    when / aa/
+      11
+    when /  a/
+      9
+    when / a./
+      6
+    when / s./
+      7
+    else
+      0
     end
   end
 

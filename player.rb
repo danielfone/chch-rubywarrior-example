@@ -41,11 +41,9 @@ private
     @turn        = 1
     @prev_health ||= 0
     @warrior     ||= warrior
-    @seen_rear_wall = false
   end
 
   def before_turn
-    #@seen_rear_wall = true if feel(:backward).wall?
     @direction = :forward
     @archer_direction = [:backward].find { |d| archer_in_range?(d) }
     @enemy_direction = [:backward].find { |d| enemy_in_range?(d) }
@@ -66,7 +64,7 @@ private
   def taking_damage_action
     case
     when engaged? && health_critical?
-      [:walk!, :backward]
+      retreat!
     when engaged?
       :attack!
     else
@@ -86,8 +84,8 @@ private
     when @needs_health && safe?
       :rest!
     when @needs_health && !safe?
-      @required_health += 3
-      [:walk!, :backward]
+      @required_health += 3 # accounts for archers
+      retreat!
     else
       ready_to_go_action
     end
@@ -117,6 +115,10 @@ private
   def go_to_stairs
     return [:pivot!, @stairs_direction] if @stairs_direction
     return :walk!
+  end
+
+  def retreat!
+    [:walk!, :backward]
   end
 
 end

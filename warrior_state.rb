@@ -21,11 +21,6 @@ module WarriorState
     health < FULL_HEALTH*0.10
   end
 
-  def health_not_optimal?
-    health < FULL_HEALTH*0.30
-  end
-
-
   def taking_damage?
     health < @prev_health
   end

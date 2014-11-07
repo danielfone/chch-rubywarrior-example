@@ -1,18 +1,23 @@
 module Eventable
   module ClassMethods
     def listeners
-      @listeners ||= Hash.new []
+      @listeners
+    end
+
+    def listeners=(val)
+      @listeners = val
     end
 
     def on(event, *methods)
       listeners[event] += Array(methods)
+      puts listeners.inspect
     end
   end
 
   module InstanceMethods
     def trigger(event, *args)
-      self.class.listeners[event].each do |methods|
-        send methods, *args
+      self.class.listeners[event].each do |method|
+        send method, *args
       end
     end
   end
@@ -20,5 +25,6 @@ module Eventable
   def self.included(receiver)
     receiver.extend         ClassMethods
     receiver.send :include, InstanceMethods
+    receiver.listeners = Hash.new []
   end
 end

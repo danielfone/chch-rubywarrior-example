@@ -1,6 +1,7 @@
 require 'pry'
 require 'forwardable'
 require 'logging'
+require 'eventable'
 require 'warrior_state'
 require 'warrior_context'
 
@@ -10,6 +11,7 @@ class Player
   extend Forwardable
   include WarriorState
   include WarriorContext
+  include Eventable
 
   attr_reader :warrior, :prev_health
 
@@ -20,8 +22,10 @@ class Player
     :listen,
   ]
 
+  on :game_start, :initialize_game
+
   def play_turn(warrior)
-    before_game(warrior) if first_turn?
+    trigger :game_start, warrior if first_turn?
     before_turn
     warrior.send *choose_action
     after_turn
@@ -37,7 +41,7 @@ private
     end
   end
 
-  def before_game(warrior)
+  def initialize_game(warrior)
     @turn        = 1
     @prev_health ||= 0
     @warrior     ||= warrior

@@ -30,7 +30,7 @@ private
     when needs_health? && safe?
       :rest!
     when needs_health? && !safe?
-      @target_health += 3 # accounts for archers
+      @target_health += 3 if next_unit_name == 'Archer' # dat arrow
       retreat!
     else
       ready_to_go_action
@@ -57,7 +57,7 @@ private
   end
 
   def go_to_stairs!
-    stairs_visible?(:backward) ? retreat! : :walk!
+    [:walk!, stairs_direction]
   end
 
   def retreat!

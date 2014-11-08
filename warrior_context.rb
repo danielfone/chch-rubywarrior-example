@@ -33,10 +33,6 @@ module WarriorContext
     look(direction).any? &:captive?
   end
 
-  def stairs_visible?(direction=:forward)
-    look(direction).any? &:stairs?
-  end
-
   def archer_visible?(direction=:forward)
     look(direction).any? { |s| s.unit && s.unit.name == "Archer" }
   end
@@ -58,8 +54,15 @@ module WarriorContext
   end
 
   def safe?
-    [:forward, :backward].none? { |d| engaged? d } &&
-    [:forward, :backward].none? {|d| archer_visible? d }
+    ! engaged? && ! archer_visible?
+  end
+
+  def stairs_direction
+    if look(:backward).any? &:stairs?
+      :backward
+    else
+      :forward
+    end
   end
 
 end

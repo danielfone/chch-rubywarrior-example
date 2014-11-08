@@ -20,5 +20,6 @@ module Eventable
 
   def self.included(base)
     base.extend  ClassMethods
+    base.listeners.clear
   end
 end

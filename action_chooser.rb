@@ -90,6 +90,7 @@ private
   end
 
   def required_health
+    puts next_spaces.inspect
     case next_spaces
     when / S./
       13
@@ -101,9 +102,15 @@ private
       6
     when / s./
       7
-    else
+    when /  w/
       0
-    end
+    when /[^asSw]*[\>C]/
+      0
+    when /[asSw]/
+      0
+    else
+      11
+    end.tap {|i| puts "Require #{i}, have #{warrior.health}" }
   end
 
 end

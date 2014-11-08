@@ -4,8 +4,8 @@ require 'warrior_context'
 module ActionChooser
 
   def self.included(base)
-    base.public_send :include, WarriorState
-    base.public_send :include, WarriorContext
+    base.include WarriorState
+    base.include WarriorContext
 
     base.on :turn_start, *[
       :assess_required_health,

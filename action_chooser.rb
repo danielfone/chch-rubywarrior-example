@@ -32,12 +32,8 @@ private
   end
 
   def hurting_action
-    case
-    when needs_health? && safe?
-      :rest!
-    when needs_health? && !safe?
-      @target_health += 3 if next_object == 'a' # dat arrow
-      retreat!
+    if needs_health?
+      safely_rest!
     else
       ready_to_go_action
     end
@@ -64,6 +60,15 @@ private
 
   def go_to_stairs!
     [:walk!, stairs_direction]
+  end
+
+  def safely_rest!
+    if safe?
+      :rest!
+    else
+      @target_health += 3 if next_object == 'a' # dat arrow
+      retreat!
+    end
   end
 
   def retreat!

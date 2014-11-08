@@ -1,7 +1,15 @@
+require 'forwardable'
+
 module WarriorContext
+  extend Forwardable
+
+  def_delegators :warrior, *[
+    :feel,
+    :look,
+  ]
 
   def next_spaces
-    look.map(&:character).join
+    warrior.look.map(&:character).join
   end
 
   def next_unit_name(direction=:forward)

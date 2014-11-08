@@ -1,6 +1,12 @@
+require 'warrior_state'
+require 'warrior_context'
+
 module ActionChooser
 
   def self.included(base)
+    base.public_send :include, WarriorState
+    base.public_send :include, WarriorContext
+
     base.on :turn_start, *[
       :assess_required_health,
       :assess_fitness,
@@ -70,7 +76,7 @@ private
 
   def assess_fitness
     # Clear our health target if we've met it
-    @target_health = nil if health >= @target_health
+    @target_health = nil if warrior.health >= @target_health
   end
 
   def assess_required_health

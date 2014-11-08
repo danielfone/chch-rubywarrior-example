@@ -4,7 +4,7 @@ module ColorLogging
   ANSI_ORANGE = 33
 
   def puts_color(color_code, message)
-    puts "\e[0;#{color_code}m" << message << "\e[0m"
+    puts "\e[0;#{color_code}m#{message}\e[0m"
   end
 
   def puts_warn(message)

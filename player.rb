@@ -15,7 +15,7 @@ class Player
   include WarriorContext
   include ActionChooser
 
-  attr_reader :warrior, :prev_health
+  attr_reader :warrior
 
   def_delegators :warrior, *[
     :health,
@@ -31,7 +31,7 @@ class Player
   def play_turn(warrior)
     trigger :game_start, warrior if first_turn?
     trigger :turn_start
-    warrior.send *choose_action
+    warrior.send *best_action
     trigger :turn_finish
   end
 

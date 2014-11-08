@@ -7,7 +7,7 @@ module ActionChooser
     ]
   end
 
-  def choose_action
+  def best_action
     case physical_state
     when :taking_damage then taking_damage_action
     when :hurting       then hurting_action

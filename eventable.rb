@@ -4,6 +4,8 @@ module Eventable
       @listeners
     end
 
+    # I wouldn't normally put an setter, but ruby warrior does some weird
+    # class reloading and we can't set this in the class defn
     def listeners=(val)
       @listeners = val
     end

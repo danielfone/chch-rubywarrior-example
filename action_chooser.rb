@@ -7,7 +7,7 @@ module ActionChooser
     base.include WarriorState
     base.include WarriorContext
 
-    base.on :turn_start, *[
+    base.on :turn_start, [
       :assess_required_health,
       :assess_fitness,
     ]

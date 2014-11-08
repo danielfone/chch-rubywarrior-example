@@ -39,24 +39,25 @@ private
 
   def ready_to_go_action
     # Deal with captives
-    return :pivot!  if captive_in_range? :backward
-    return :rescue! if near_captive?
+    return [:rescue!, :backward] if next_to_captive? :backward
+    return [:walk!,   :backward] if next_unit_name(:backward) == 'Captive'
+    return :rescue! if next_to_captive?
     return :walk!   if next_unit_name == 'Captive'
 
     # Deal with enemies
     return :attack! if engaged?
     return :shoot!  if clear_shot_on_wizard?
-    return :walk!   if enemy_in_range?
-    return :pivot!  if enemy_in_range? :backward
+    return :walk!   if enemy_visible?
+    return :pivot!  if enemy_visible? :backward
 
     # navigate
-    return :pivot! if blocked?
-    go_to_stairs!  if range_clear?
+    return :pivot!       if blocked?
+    return go_to_stairs! if range_clear?
     return :walk!
   end
 
   def go_to_stairs!
-    stairs_in_range?(:backward) ? retreat! : :walk!
+    stairs_visible?(:backward) ? retreat! : :walk!
   end
 
   def retreat!

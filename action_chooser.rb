@@ -81,6 +81,7 @@ private
 
   def assess_fitness
     # Clear our health target if we've met it
+    puts "Require #{@target_health}, have #{warrior.health}" if @target_health
     @target_health = nil if warrior.health >= @target_health
   end
 
@@ -90,7 +91,6 @@ private
   end
 
   def required_health
-    puts next_spaces.inspect
     case next_spaces
     when / S./
       13
@@ -110,7 +110,7 @@ private
       0
     else
       11
-    end.tap {|i| puts "Require #{i}, have #{warrior.health}" }
+    end
   end
 
 end

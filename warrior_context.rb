@@ -8,17 +8,16 @@ module WarriorContext
     :look,
   ]
 
-  def next_spaces
-    warrior.look.map(&:character).join
+  def next_spaces(direction=:forward)
+    look(direction).map(&:character).join
   end
 
-  def next_unit_name(direction=:forward)
-    next_unit_space = look(direction).find { |s| s.unit }
-    next_unit_space.unit.name if next_unit_space
+  def next_object(direction=:forward)
+    next_spaces(direction).strip[0]
   end
 
   def clear_shot_on_wizard?
-    next_unit_name == 'Wizard'
+    next_object == 'w'
   end
 
   def engaged?(direction=:forward)
@@ -41,20 +40,20 @@ module WarriorContext
     look(direction).any? &:captive?
   end
 
-  def archer_visible?(direction=:forward)
-    look(direction).any? { |s| s.unit && s.unit.name == "Archer" }
+  def archer_ahead?
+    next_spaces.include? 'a'
   end
 
-  def wizard_visible?(direction=:forward)
-    look(direction).any? { |s| s.unit && s.unit.name == "Wizard" }
+  def wizard_ahead?
+    next_spaces.include? 'w'
   end
 
   def enemies_visible?
-    [:forward, :backward].any? { |d| enemy_visible? d }
+    any_direction? { |d| enemy_visible? d }
   end
 
   def captives_visible?
-    [:forward, :backward].any? { |d| captive_visible? d }
+    any_direction? { |d| captive_visible? d }
   end
 
   def range_clear?
@@ -62,7 +61,7 @@ module WarriorContext
   end
 
   def safe?
-    ! engaged? && ! archer_visible?
+    ! engaged? && ! archer_ahead?
   end
 
   def stairs_direction
@@ -71,6 +70,10 @@ module WarriorContext
     else
       :forward
     end
+  end
+
+  def any_direction?(&block)
+    [:forward, :backward].any? &block
   end
 
 end

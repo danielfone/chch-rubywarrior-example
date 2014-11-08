@@ -36,7 +36,7 @@ private
     when needs_health? && safe?
       :rest!
     when needs_health? && !safe?
-      @target_health += 3 if next_unit_name == 'Archer' # dat arrow
+      @target_health += 3 if next_object == 'a' # dat arrow
       retreat!
     else
       ready_to_go_action
@@ -46,9 +46,9 @@ private
   def ready_to_go_action
     # Deal with captives
     return [:rescue!, :backward] if next_to_captive? :backward
-    return [:walk!,   :backward] if next_unit_name(:backward) == 'Captive'
+    return [:walk!,   :backward] if next_object(:backward) == 'C'
     return :rescue! if next_to_captive?
-    return :walk!   if next_unit_name == 'Captive'
+    return :walk!   if next_object == 'C'
 
     # Deal with enemies
     return :attack! if engaged?

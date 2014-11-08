@@ -25,7 +25,6 @@ class Player
   ]
 
   on :game_start, :initialize_game
-  on :turn_start, :before_turn
   on :turn_finish, :increment_turn
 
   def play_turn(warrior)
@@ -38,16 +37,8 @@ class Player
 private
 
   def initialize_game(warrior)
-    @turn        = 1
-    @warrior     ||= warrior
-  end
-
-  def before_turn
-    @direction = :forward
-    @archer_direction = [:backward].find { |d| archer_in_range?(d) }
-    @enemy_direction = [:backward].find { |d| enemy_in_range?(d) }
-    @captive_direction = [:backward].find { |d| captive_in_range?(d) }
-    @stairs_direction = [:backward].find { |d| stairs_in_range?(d) }
+    @turn    = 1
+    @warrior ||= warrior
   end
 
   def increment_turn

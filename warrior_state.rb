@@ -1,5 +1,4 @@
 module WarriorState
-
   FULL_HEALTH = 20
 
   def self.included(base)
@@ -27,10 +26,14 @@ module WarriorState
   end
 
   def taking_damage?
-    health < @prev_health
+    health < prev_health
   end
 
 private
+
+  def prev_health
+    @prev_health
+  end
 
   def initialize_health(warrior)
     @prev_health = 0

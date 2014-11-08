@@ -2,8 +2,8 @@ module ActionChooser
 
   def self.included(base)
     base.on :turn_start, *[
-      :assess_fitness,
       :assess_required_health,
+      :assess_fitness,
     ]
   end
 
@@ -18,11 +18,8 @@ module ActionChooser
 private
 
   def taking_damage_action
-    case
-    when engaged? && health_critical?
-      retreat!
-    when engaged?
-      :attack!
+    if engaged?
+      health_critical? ? retreat! : :attack!
     else
       hurting_action
     end
@@ -30,9 +27,9 @@ private
 
   def hurting_action
     case
-    when @target_health && safe?
+    when needs_health? && safe?
       :rest!
-    when @target_health && !safe?
+    when needs_health? && !safe?
       @target_health += 3 # accounts for archers
       retreat!
     else
@@ -42,47 +39,42 @@ private
 
   def ready_to_go_action
     # Deal with captives
-    return [:pivot!, @captive_direction]  if @captive_direction
+    return :pivot!  if captive_in_range? :backward
     return :rescue! if near_captive?
-    return :walk! if next_unit_name == 'Captive'
+    return :walk!   if next_unit_name == 'Captive'
 
     # Deal with enemies
     return :attack! if engaged?
     return :shoot!  if clear_shot_on_wizard?
     return :walk!   if enemy_in_range?
-    return [:pivot!, @archer_direction]   if @archer_direction
-    return [:pivot!, @enemy_direction]  if @enemy_direction
-
+    return :pivot!  if enemy_in_range? :backward
 
     # navigate
-    return [:pivot!, :backward]  if blocked?
-    return [:pivot!, @stairs_direction] if @stairs_direction
-    go_to_stairs if range_clear?
+    return :pivot! if blocked?
+    go_to_stairs!  if range_clear?
     return :walk!
   end
 
-  def go_to_stairs
-    return [:pivot!, @stairs_direction] if @stairs_direction
-    return :walk!
+  def go_to_stairs!
+    stairs_in_range?(:backward) ? retreat! : :walk!
   end
 
   def retreat!
     [:walk!, :backward]
   end
 
+  def needs_health?
+    !! @target_health
+  end
+
   def assess_fitness
-    if @target_health && health >= @target_health
-      @target_health = nil
-      puts_color ANSI_GREEN, "Fighting fit"
-    end
+    # Clear our health target if we've met it
+    @target_health = nil if health >= @target_health
   end
 
   def assess_required_health
-    return if @target_health # We've already got a target, don't update
-    if health < required_health
-      @target_health = required_health
-      puts_color ANSI_RED, "Need rest!"
-    end
+    # If we've already got a health target, don't update
+    @target_health ||= required_health
   end
 
   def required_health

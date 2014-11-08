@@ -1,4 +1,8 @@
+require 'color_logging'
+
 module WarriorState
+  include ColorLogging
+
   FULL_HEALTH = 20
 
   def self.included(base)
@@ -8,11 +12,11 @@ module WarriorState
   def physical_state
     case
     when taking_damage?
-      :taking_damage.tap { puts_color(ANSI_RED, "Taking damage") }
+      :taking_damage.tap { puts_danger "Taking damage" }
     when ! fit?
-      :hurting.tap { puts_color(ANSI_ORANGE, "Hurting: #{warrior.health}/#{FULL_HEALTH}") }
+      :hurting.tap       { puts_warn   "Hurting: #{warrior.health}/#{FULL_HEALTH}" }
     else
-      :ready_to_go.tap { puts_color(ANSI_GREEN, "Ready to go!") }
+      :ready_to_go.tap   { puts_success "Ready to go!" }
     end
   end
 

@@ -1,9 +1,5 @@
-require 'pry'
-require 'logging'
 require 'eventable'
 require 'action_chooser'
-
-include ColorLogging
 
 class Player
   include Eventable

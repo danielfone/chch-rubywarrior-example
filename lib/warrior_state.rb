@@ -1,4 +1,4 @@
-require 'color_logging'
+require 'lib/color_logging'
 
 module WarriorState
   include ColorLogging

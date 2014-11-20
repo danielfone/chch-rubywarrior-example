@@ -1,5 +1,5 @@
-require 'warrior_state'
-require 'warrior_context'
+require 'lib/warrior_state'
+require 'lib/warrior_context'
 
 module ActionChooser
 

@@ -1,5 +1,5 @@
-require 'eventable'
-require 'action_chooser'
+require 'lib/eventable'
+require 'lib/action_chooser'
 
 class Player
   include Eventable

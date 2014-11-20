@@ -1,3 +1,17 @@
+#
+# Simple event handler for 'inter-module' evnts
+#
+# class Player
+#   include Eventable
+#
+#   on :begin_turn, :survey_world
+#
+#   def play_turn(...)
+#     trigger :begin_turn
+#   end
+# end
+#
+
 module Eventable
 
   def trigger(event, *args)
